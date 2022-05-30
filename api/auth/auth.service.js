@@ -4,12 +4,16 @@ const userService = require('../user/user.service')
 const logger = require('../../services/logger.service')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
-async function login(username, password) {
-  logger.debug(`auth.service - login with username: ${username}`)
+async function login(loginWith, password) {
+  if(loginWith.username){
+    logger.debug(`auth.service - login with username: ${loginWith.username}`)
+  }else logger.debug(`auth.service - login with email: ${loginWith.email}`)
 
-  const user = await userService.getByUsername(username)
+  const user = await userService.getUser(loginWith)
+  console.log('got user from userservice',user)
   if (!user) return Promise.reject('Invalid username or password')
   // TODO: un-comment for real login
+  console.log('b4 match', password)
   const match = await bcrypt.compare(password, user.password)
   if (!match) return Promise.reject('Invalid username or password')
 
@@ -23,17 +27,19 @@ async function login(username, password) {
 //     await signup('mumu', '123', 'Mumu Maha')
 // })()
 
-async function signup({ username, password, fullname, imgUrl }) {
+async function signup({ username, password, email, fullname, imgUrl }) {
   const saltRounds = 10
 
   logger.debug(`auth.service - signup with username: ${username}, fullname: ${fullname}`)
-  if (!username || !password || !fullname) return Promise.reject('Missing required signup information')
+  if (!username || !password || !email || !fullname) return Promise.reject('Missing required signup information')
 
-  const userExist = await userService.getByUsername(username)
-  if (userExist) return Promise.reject('Username already taken')
+  const usernameExist = await userService.getUser(username)
+  const emailExist = await userService.getUser(email)
+  if (usernameExist) return Promise.reject('Username already taken')
+  if (emailExist) return Promise.reject('Email already taken')
 
   const hash = await bcrypt.hash(password, saltRounds)
-  return userService.add({ username, password: hash, fullname, imgUrl })
+  return userService.add({ username, password: hash, email, fullname, imgUrl })
 }
 
 function getLoginToken(user) {

@@ -5,7 +5,7 @@ const ObjectId = require('mongodb').ObjectId
 module.exports = {
   query,
   getById,
-  getByUsername,
+  getUser,
   remove,
   update,
   add,
@@ -50,13 +50,22 @@ async function getById(userId) {
     throw err
   }
 }
-async function getByUsername(username) {
+async function getUser(loginWith) {
   try {
+    // console.log(loginWith)
     const collection = await dbService.getCollection('user')
-    const user = await collection.findOne({ username })
+    let user = null
+    if(loginWith.username){
+      const { username } = loginWith
+      user = await collection.findOne({ username })
+    }else {
+      const { email } = loginWith
+      user = await collection.findOne({ email })
+      console.log('got user from db', user)
+    }
     return user
   } catch (err) {
-    logger.error(`while finding user ${username}`, err)
+    // logger.error(`while finding user email ${email}`, err)
     throw err
   }
 }
@@ -92,6 +101,7 @@ async function add(user) {
     // peek only updatable fields!
     const userToAdd = {
       username: user.username,
+      email: user.email,
       password: user.password,
       fullname: user.fullname,
       imgUrl: user.imgUrl,

@@ -52,7 +52,7 @@ async function getById(userId) {
 }
 async function getUser(credentials) {
   try {
-    // console.log(loginWith)
+    console.log('credentials',credentials)
     const collection = await dbService.getCollection('user')
     let user = null
     if (credentials.username) {
@@ -64,6 +64,7 @@ async function getUser(credentials) {
       user = await collection.findOne({ email })
       logger.debug(`auth.service - login with email: ${email}`)
     }
+    console.log(user)
     return user
   } catch (err) {
     // logger.error(`while finding user email ${email}`, err)

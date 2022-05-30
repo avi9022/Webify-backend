@@ -19,6 +19,7 @@ async function login(req, res) {
 async function signup(req, res) {
   try {
     const credentials = req.body
+    console.log(credentials)
     const account = await authService.signup(credentials)
     logger.debug(`auth.route - new account created: ` + JSON.stringify(account))
     const user = await authService.login(credentials)

@@ -4,11 +4,12 @@ const userService = require('../user/user.service')
 const logger = require('../../services/logger.service')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
-async function login(credentials) {
-  const user = await userService.getUser(credentials)
+async function login(loginWith,password) {
+  const user = await userService.getUser(loginWith)
   if (!user) return Promise.reject('Invalid username or password')
 
-  const match = await bcrypt.compare(credentials.password, user.password)
+  console.log(user)
+  const match = await bcrypt.compare(password, user.password)
   if (!match) return Promise.reject('Invalid username or password')
   console.log('here', match)
 

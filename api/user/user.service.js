@@ -4,13 +4,13 @@ const ObjectId = require('mongodb').ObjectId
 
 module.exports = {
   query,
-  getById,
   getUser,
   remove,
   update,
   add,
   saveWap,
   deleteWap,
+  getById,
 }
 
 async function query(filterBy = {}) {
@@ -37,13 +37,6 @@ async function getById(userId) {
     const collection = await dbService.getCollection('user')
     const user = await collection.findOne({ _id: ObjectId(userId) })
     delete user.password
-
-    user.givenReviews = await reviewService.query({ byUserId: ObjectId(user._id) })
-    user.givenReviews = user.givenReviews.map((review) => {
-      delete review.byUser
-      return review
-    })
-
     return user
   } catch (err) {
     logger.error(`while finding user ${userId}`, err)
@@ -52,7 +45,7 @@ async function getById(userId) {
 }
 async function getUser(credentials) {
   try {
-    console.log('credentials',credentials)
+    console.log('credentials', credentials)
     const collection = await dbService.getCollection('user')
     let user = null
     if (credentials.username) {
@@ -64,7 +57,6 @@ async function getUser(credentials) {
       user = await collection.findOne({ email })
       logger.debug(`auth.service - login with email: ${email}`)
     }
-    console.log(user)
     return user
   } catch (err) {
     // logger.error(`while finding user email ${email}`, err)

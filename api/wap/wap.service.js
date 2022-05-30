@@ -45,7 +45,7 @@ async function save(wap) {
     const collection = await dbService.getCollection('wap')
     return await collection.insertOne(wap)
   } catch (err) {
-    logger.err('cannot save wap', err)
+    logger.error('cannot save wap', err)
     throw err
   }
 }
@@ -53,18 +53,21 @@ async function save(wap) {
 async function update(wapId, wap) {
   try {
     const collection = await dbService.getCollection('wap')
-    await collection.updateOne({ _id: wapId }, { $set: wap })
-    return wap
+    const wapCopy = JSON.parse(JSON.stringify(wap))
+    const wapMongoId = ObjectId(wapId)
+    delete wap._id
+    await collection.updateOne({ _id: wapMongoId }, { $set: wap })
+    return wapCopy
   } catch (err) {
-    logger.err('cannot save wap', err)
+    logger.error('cannot save wap', err)
     throw err
   }
 }
 
 async function remove(wapId) {
   try {
-    const wap = await collection.findOne({ _id: ObjectId(wapId) })
     const collection = await dbService.getCollection('wap')
+    const wap = await collection.findOne({ _id: ObjectId(wapId) })
     await collection.deleteOne({ _id: ObjectId(wapId) })
     return wap.createdBy
   } catch (err) {

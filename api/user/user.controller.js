@@ -1,8 +1,18 @@
-// const wapService = require('./wap.service')
 const socketService = require('../../services/socket.service')
 const logger = require('../../services/logger.service')
+const userService = require('./user.service')
 
 async function getUser(req, res) {
+  try {
+    const user = await userService.getUser(req.params.id)
+    res.send(user)
+  } catch (err) {
+    logger.error('Failed to get user', err)
+    res.status(500).send({ err: 'Failed to get user' })
+  }
+}
+
+async function getById(req, res) {
   try {
     const user = await userService.getById(req.params.id)
     res.send(user)
@@ -52,4 +62,5 @@ module.exports = {
   getUsers,
   deleteUser,
   updateUser,
+  getById,
 }

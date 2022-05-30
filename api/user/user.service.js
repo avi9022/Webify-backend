@@ -47,6 +47,7 @@ async function getUser(credentials) {
   try {
     console.log('credentials', credentials)
     const collection = await dbService.getCollection('user')
+    console.log(collection)
     let user = null
     if (credentials.username) {
       const { username } = credentials
@@ -111,7 +112,9 @@ async function add(user) {
 
 async function saveWap(wap, user) {
   try {
-    const existingWapIndex = user.waps.findIndex((currWap) => currWap?._id === wap._id)
+    const existingWapIndex = user.waps.findIndex(
+      (currWap) => currWap?._id === wap._id
+    )
     if (existingWapIndex > -1) user.waps.splice(existingWapIndex, 1, wap)
     else user.waps.unshift(wap)
     await update(user)

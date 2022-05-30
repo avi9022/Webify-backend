@@ -5,17 +5,22 @@ const logger = require('../../services/logger.service')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
 async function login(loginWith,password) {
-  const user = await userService.getUser(loginWith)
-  if (!user) return Promise.reject('Invalid username or password')
-
-  console.log(user)
-  const match = await bcrypt.compare(password, user.password)
-  if (!match) return Promise.reject('Invalid username or password')
-  console.log('here', match)
-
-  delete user.password
-  user._id = user._id.toString()
-  return user
+  try{
+    console.log('logwith',loginWith,password)
+    const user = await userService.getUser(loginWith)
+    if (!user) return Promise.reject('Invalid username or password')
+  
+    console.log('user from service',user)
+    const match = await bcrypt.compare(password, user.password)
+    if (!match) return Promise.reject('Invalid username or password')
+    console.log('here', match)
+  
+    delete user.password
+    user._id = user._id.toString()
+    return user
+  } catch (err){
+    throw err
+  }
 }
 
 // (async ()=>{

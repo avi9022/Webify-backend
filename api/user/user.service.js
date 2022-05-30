@@ -1,6 +1,5 @@
 const dbService = require('../../services/db.service')
 const logger = require('../../services/logger.service')
-const reviewService = require('../review/review.service')
 const ObjectId = require('mongodb').ObjectId
 
 module.exports = {
@@ -11,6 +10,7 @@ module.exports = {
   update,
   add,
   saveWap,
+  deleteWap,
 }
 
 async function query(filterBy = {}) {
@@ -111,7 +111,20 @@ async function saveWap(wap, user) {
     const existingWapIndex = user.waps.findIndex((currWap) => currWap?._id === wap._id)
     if (existingWapIndex > -1) user.waps.splice(existingWapIndex, 1, wap)
     else user.waps.unshift(wap)
-    return await update(user)
+    await update(user)
+    return user
+  } catch (err) {
+    logger.err('cannot save wap', err)
+    throw err
+  }
+}
+
+async function deleteWap(wap, user) {
+  try {
+    const wapIdx = user.waps.findIndex((currWap) => currWap._id === wap._id)
+    user.waps.splice(wapIdx, 1)
+    await update(user)
+    return user
   } catch (err) {
     logger.err('cannot save wap', err)
     throw err

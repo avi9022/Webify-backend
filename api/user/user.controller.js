@@ -1,4 +1,4 @@
-const userService = require('./user.service')
+// const wapService = require('./wap.service')
 const socketService = require('../../services/socket.service')
 const logger = require('../../services/logger.service')
 
@@ -47,22 +47,9 @@ async function updateUser(req, res) {
   }
 }
 
-async function saveWap(req, res) {
-  try {
-    const user = await userService.getById(req.params.id)
-    const wapToSave = req.body
-    const updatedUser = await userService.saveWap(wapToSave, user)
-    res.send(updatedUser)
-  } catch (err) {
-    logger.error('Failed to update user', err)
-    res.status(500).send({ err: 'Failed to update user' })
-  }
-}
-
 module.exports = {
   getUser,
   getUsers,
   deleteUser,
   updateUser,
-  saveWap,
 }

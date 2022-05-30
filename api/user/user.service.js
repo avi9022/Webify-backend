@@ -10,6 +10,7 @@ module.exports = {
   remove,
   update,
   add,
+  saveWap,
 }
 
 async function query(filterBy = {}) {
@@ -75,7 +76,7 @@ async function update(user) {
     // peek only updatable properties
     const userToSave = {
       _id: ObjectId(user._id), // needed for the returnd obj
-      fullname: user.fullname,
+      waps: user.waps,
     }
     const collection = await dbService.getCollection('user')
     await collection.updateOne({ _id: userToSave._id }, { $set: userToSave })
@@ -101,6 +102,18 @@ async function add(user) {
     return userToAdd
   } catch (err) {
     logger.error('cannot insert user', err)
+    throw err
+  }
+}
+
+async function saveWap(wap, user) {
+  try {
+    const existingWapIndex = user.waps.findIndex((currWap) => currWap?._id === wap._id)
+    if (existingWapIndex > -1) user.waps.splice(existingWapIndex, 1, wap)
+    else user.waps.unshift(wap)
+    return await update(user)
+  } catch (err) {
+    logger.err('cannot save wap', err)
     throw err
   }
 }

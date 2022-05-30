@@ -4,18 +4,13 @@ const userService = require('../user/user.service')
 const logger = require('../../services/logger.service')
 const cryptr = new Cryptr(process.env.SECRET1 || 'Secret-Puk-1234')
 
-async function login(loginWith, password) {
-  if(loginWith.username){
-    logger.debug(`auth.service - login with username: ${loginWith.username}`)
-  }else logger.debug(`auth.service - login with email: ${loginWith.email}`)
-
-  const user = await userService.getUser(loginWith)
-  console.log('got user from userservice',user)
+async function login(credentials) {
+  const user = await userService.getUser(credentials)
   if (!user) return Promise.reject('Invalid username or password')
-  // TODO: un-comment for real login
-  console.log('b4 match', password)
-  const match = await bcrypt.compare(password, user.password)
+
+  const match = await bcrypt.compare(credentials.password, user.password)
   if (!match) return Promise.reject('Invalid username or password')
+  console.log('here', match)
 
   delete user.password
   user._id = user._id.toString()

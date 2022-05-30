@@ -2,9 +2,9 @@ const authService = require('./auth.service')
 const logger = require('../../services/logger.service')
 
 async function login(req, res) {
-  const { username,email, password } = req.body
+  const { username, email, password } = req.body
   try {
-    const loginWith = (username) ? {username} : {email}
+    const loginWith = username ? { username } : { email }
     const user = await authService.login(loginWith, password)
     const loginToken = authService.getLoginToken(user)
     logger.info('User login: ', user.email)
@@ -21,7 +21,7 @@ async function signup(req, res) {
     const credentials = req.body
     const account = await authService.signup(credentials)
     logger.debug(`auth.route - new account created: ` + JSON.stringify(account))
-    const user = await authService.login(credentials.username, credentials.password)
+    const user = await authService.login(credentials)
     logger.info('User signup:', user)
     const loginToken = authService.getLoginToken(user)
     res.cookie('loginToken', loginToken)

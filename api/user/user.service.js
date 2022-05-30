@@ -50,18 +50,19 @@ async function getById(userId) {
     throw err
   }
 }
-async function getUser(loginWith) {
+async function getUser(credentials) {
   try {
     // console.log(loginWith)
     const collection = await dbService.getCollection('user')
     let user = null
-    if(loginWith.username){
-      const { username } = loginWith
+    if (credentials.username) {
+      const { username } = credentials
       user = await collection.findOne({ username })
-    }else {
-      const { email } = loginWith
+      logger.debug(`auth.service - login with username: ${username}`)
+    } else {
+      const { email } = credentials
       user = await collection.findOne({ email })
-      console.log('got user from db', user)
+      logger.debug(`auth.service - login with email: ${email}`)
     }
     return user
   } catch (err) {

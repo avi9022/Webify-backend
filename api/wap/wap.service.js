@@ -67,9 +67,7 @@ async function update(wapId, wap) {
 async function remove(wapId) {
   try {
     const collection = await dbService.getCollection('wap')
-    const wap = await collection.findOne({ _id: ObjectId(wapId) })
     await collection.deleteOne({ _id: ObjectId(wapId) })
-    return wap.createdBy
   } catch (err) {
     logger.error(`cannot remove wap ${wapId}`, err)
     throw err

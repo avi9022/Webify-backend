@@ -54,7 +54,9 @@ async function removeWap(req, res) {
   try {
     const wapId = req.params.id
     const username = await wapService.remove(wapId)
+    console.log('username',username)
     const user = await userService.getUser({ username })
+    console.log('user',user)
     const miniWapIdx = user.waps.findIndex((currWap) => currWap._id === wapId)
     user.waps.splice(miniWapIdx, 1)
     await userService.update(user)

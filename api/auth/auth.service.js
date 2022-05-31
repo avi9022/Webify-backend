@@ -24,9 +24,7 @@ async function loginWithGoogle(credentials) {
   try {
     let user = await userService.getUser({ email: credentials.email })
     if (!user) {
-      console.log('here1!!!!!!')
       user = await signup(credentials)
-      console.log(user)
     }
 
     const match = await bcrypt.compare(credentials.password, user.password)
@@ -41,13 +39,11 @@ async function loginWithGoogle(credentials) {
 
 async function signup({ username, password, email, fullname, imgUrl }) {
   const saltRounds = 10
-  console.log('here3!!!!!!')
   logger.debug(`auth.service - signup with username: ${username}, fullname: ${fullname}`)
   if (!username || !password || !email || !fullname) return Promise.reject('Missing required signup information')
 
   const usernameExist = await userService.getUser(username)
   const emailExist = await userService.getUser(email)
-  console.log('try me')
   if (usernameExist) return Promise.reject('Username already taken')
   if (emailExist) return Promise.reject('Email already taken')
 

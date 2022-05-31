@@ -11,6 +11,7 @@ module.exports = {
 }
 
 async function query(filterBy = {}) {
+  console.log(filterBy)
   const criteria = _buildCriteria(filterBy)
   try {
     const collection = await dbService.getCollection('wap')
@@ -76,14 +77,10 @@ async function remove(wapId) {
 
 function _buildCriteria(filterBy) {
   const criteria = {}
-  if (filterBy.txt) {
-    const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
+  if (filterBy.createdBy) {
     criteria.$or = [
       {
-        username: txtCriteria,
-      },
-      {
-        fullname: txtCriteria,
+        createdBy: filterBy.createdBy,
       },
     ]
   }

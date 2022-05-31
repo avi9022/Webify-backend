@@ -4,7 +4,7 @@ const logger = require('../../services/logger.service')
 
 async function getSavedWaps(req, res) {
   try {
-    const waps = await wapService.query({ createdBy: req.body })
+    const waps = await wapService.query({ createdBy: req.query.email })
     res.send(waps)
   } catch (err) {
     logger.error('Failed to get waps', err)
@@ -15,7 +15,6 @@ async function getSavedWaps(req, res) {
 async function getWap(req, res) {
   try {
     const wap = await wapService.getById(req.params.id)
-    console.log(wap)
     res.send(wap)
   } catch (err) {
     logger.error('Failed to get wap', err)

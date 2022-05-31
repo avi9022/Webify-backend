@@ -5,12 +5,12 @@ async function login(req, res) {
   const { username, email, password, googleLogin } = req.body
   try {
     let user
+    const loginWith = username ? { username } : { email }
     if (googleLogin) {
       user = await authService.loginWithGoogle(req.body)
     } else {
       user = await authService.login(loginWith, password)
     }
-    const loginWith = username ? { username } : { email }
     const loginToken = authService.getLoginToken(user)
     logger.info('User login: ', user.email)
     res.cookie('loginToken', loginToken)

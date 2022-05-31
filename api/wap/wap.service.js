@@ -11,6 +11,7 @@ module.exports = {
 }
 
 async function query(filterBy = {}) {
+  console.log(filterBy)
   const criteria = _buildCriteria(filterBy)
   try {
     const collection = await dbService.getCollection('wap')
@@ -67,10 +68,7 @@ async function update(wapId, wap) {
 async function remove(wapId) {
   try {
     const collection = await dbService.getCollection('wap')
-    const wap = await collection.findOne({ _id: ObjectId(wapId) })
     await collection.deleteOne({ _id: ObjectId(wapId) })
-    console.log(wap)
-    return wap.createdBy
   } catch (err) {
     logger.error(`cannot remove wap ${wapId}`, err)
     throw err
@@ -79,14 +77,10 @@ async function remove(wapId) {
 
 function _buildCriteria(filterBy) {
   const criteria = {}
-  if (filterBy.txt) {
-    const txtCriteria = { $regex: filterBy.txt, $options: 'i' }
+  if (filterBy.createdBy) {
     criteria.$or = [
       {
-        username: txtCriteria,
-      },
-      {
-        fullname: txtCriteria,
+        createdBy: filterBy.createdBy,
       },
     ]
   }

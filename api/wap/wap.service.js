@@ -8,6 +8,7 @@ module.exports = {
   save,
   remove,
   update,
+  addNewSubscriber,
 }
 
 async function query(filterBy = {}) {
@@ -73,6 +74,13 @@ async function remove(wapId) {
     logger.error(`cannot remove wap ${wapId}`, err)
     throw err
   }
+}
+
+async function addNewSubscriber(wapId, subscriber) {
+  const wap = await getById(wapId)
+  let subscribers = wap.subscribers ? [subscriber, wap.subscribers] : [subscriber]
+  wap.subscribers = subscribers
+  await update(wapId, wap)
 }
 
 function _buildCriteria(filterBy) {

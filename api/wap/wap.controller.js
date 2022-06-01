@@ -54,10 +54,23 @@ async function removeWap(req, res) {
   }
 }
 
+async function addNewSubscriber(req, res) {
+  try {
+    const subscriber = req.body
+    const wapId = req.params.id
+    await wapService.addNewSubscriber(wapId, subscriber)
+    res.send()
+  } catch (err) {
+    logger.error('Failed to add subscriber', err)
+    res.status(500).send({ err: 'Failed to add subscriber' })
+  }
+}
+
 module.exports = {
   getWap,
   saveWap,
   updateWap,
   removeWap,
   getSavedWaps,
+  addNewSubscriber,
 }

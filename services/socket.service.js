@@ -13,27 +13,37 @@ function setupSocketAPI(http) {
         socket.on('disconnect', socket => {
             logger.info(`Socket disconnected [id: ${socket.id}]`)
         })
-        socket.on('chat-set-topic', topic => {
-            if (socket.myTopic === topic) return
-            if (socket.myTopic) {
-                socket.leave(socket.myTopic)
-                logger.info(`Socket is leaving topic ${socket.myTopic} [id: ${socket.id}]`)
+        socket.on('wap connection', editorId => {
+            console.log('got editor id',editorId)
+            if (socket.CurrEditorId === editorId) return
+            if (socket.CurrEditorId) {
+                socket.leave(socket.CurrEditorId)
+                logger.info(`Socket is leaving topic ${socket.CurrEditorId} [id: ${socket.id}]`)
             }
-            socket.join(topic)
-            socket.myTopic = topic
+            socket.join(editorId)
+            socket.CurrEditorId = editorId
+            gIo.to(socket.CurrEditorId).emit('get wap', 'wap')
         })
-        socket.on('chat-send-msg', msg => {
-            logger.info(`New chat msg from socket [id: ${socket.id}], emitting to topic ${socket.myTopic}`)
+        // socket.on('send wap', wap => {
+        //     logger.info(`sending wap from socket [id: ${socket.id}], to ${socket.CurrEditorId}`)
+        //     gIo.to(socket.CurrEditorId).emit('send wap', wap)
+        // })
+        socket.on('wap update', wap => {
+            logger.info(`Wap update from socket [id: ${socket.id}], emitting wap changes to ${socket.CurrEditorId}`)
+            console.log('wap update!!', wap)
             // emits to all sockets:
             // gIo.emit('chat addMsg', msg)
             // emits only to sockets in the same room
-            gIo.to(socket.myTopic).emit('chat-add-msg', msg)
+            // gIo.to(socket.CurrEditorId).emit('wap update', wap)
+            //when getting here - it should broadcast the wap
+            // socket.broadcast.to(socket.CurrEditorId).emit('wap update', wap)
+            socket.broadcast.emit('wap update', wap)
         })
-        socket.on('user-watch', userId => {
-            logger.info(`user-watch from socket [id: ${socket.id}], on user ${userId}`)
-            socket.join('watching:' + userId)
+        // socket.on('user-watch', userId => {
+        //     logger.info(`user-watch from socket [id: ${socket.id}], on user ${userId}`)
+        //     socket.join('watching:' + userId)
             
-        })
+        // })
         socket.on('set-user-socket', userId => {
             logger.info(`Setting socket.userId = ${userId} for socket [id: ${socket.id}]`)
             socket.userId = userId

@@ -10,6 +10,7 @@ module.exports = {
   update,
   addNewSubscriber,
   publish,
+  increaseViewCount,
 }
 
 async function query(filterBy = {}) {
@@ -93,6 +94,17 @@ async function addNewSubscriber(wapId, subscriber) {
     const wap = await getById(wapId)
     let subscribers = wap.subscribers ? [subscriber, wap.subscribers] : [subscriber]
     wap.subscribers = subscribers
+    await update(wapId, wap)
+  } catch (err) {
+    logger.error(`cannot add sbscriber to wap: ${wapId}`, err)
+    throw err
+  }
+}
+
+async function increaseViewCount(wapId) {
+  try {
+    const wap = await getById(wapId)
+    wap.viewCount = wap.viewCount ? wap.viewCount + 1 : 1
     await update(wapId, wap)
   } catch (err) {
     logger.error(`cannot add sbscriber to wap: ${wapId}`, err)

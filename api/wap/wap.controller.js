@@ -77,6 +77,17 @@ async function publishWap(req, res) {
   }
 }
 
+async function increaseViewCount(req, res) {
+  try {
+    const wapId = req.params.id
+    await wapService.increaseViewCount(wapId)
+    res.send()
+  } catch (err) {
+    logger.error('Failed to publish wap', err)
+    res.status(500).send({ err: 'Failed to publish wap' })
+  }
+}
+
 module.exports = {
   getWap,
   saveWap,
@@ -85,4 +96,5 @@ module.exports = {
   getSavedWaps,
   addNewSubscriber,
   publishWap,
+  increaseViewCount,
 }

@@ -78,11 +78,14 @@ async function remove(wapId) {
   }
 }
 
-async function publish(wapId) {
+async function publish(wap) {
   try {
-    const wap = await getById(wapId)
     wap.isPublished = true
-    await update(wapId, wap)
+    if(wap._id){
+      return await update(wap._id, wap)
+    } else {
+      return await save(wap)
+    }
   } catch (err) {
     logger.error(`cannot publish wap ${wapId}`, err)
     throw err

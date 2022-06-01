@@ -9,6 +9,8 @@ module.exports = {
   remove,
   update,
   addNewSubscriber,
+  publish,
+  increaseViewCount,
 }
 
 async function query(filterBy = {}) {
@@ -76,11 +78,38 @@ async function remove(wapId) {
   }
 }
 
+async function publish(wapId) {
+  try {
+    const wap = await getById(wapId)
+    wap.isPublished = true
+    await update(wapId, wap)
+  } catch (err) {
+    logger.error(`cannot publish wap ${wapId}`, err)
+    throw err
+  }
+}
+
 async function addNewSubscriber(wapId, subscriber) {
-  const wap = await getById(wapId)
-  let subscribers = wap.subscribers ? [subscriber, wap.subscribers] : [subscriber]
-  wap.subscribers = subscribers
-  await update(wapId, wap)
+  try {
+    const wap = await getById(wapId)
+    let subscribers = wap.subscribers ? [subscriber, wap.subscribers] : [subscriber]
+    wap.subscribers = subscribers
+    await update(wapId, wap)
+  } catch (err) {
+    logger.error(`cannot add sbscriber to wap: ${wapId}`, err)
+    throw err
+  }
+}
+
+async function increaseViewCount(wapId) {
+  try {
+    const wap = await getById(wapId)
+    wap.viewCount = wap.viewCount ? wap.viewCount + 1 : 1
+    await update(wapId, wap)
+  } catch (err) {
+    logger.error(`cannot add sbscriber to wap: ${wapId}`, err)
+    throw err
+  }
 }
 
 function _buildCriteria(filterBy) {

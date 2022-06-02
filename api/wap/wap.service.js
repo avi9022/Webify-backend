@@ -81,7 +81,7 @@ async function remove(wapId) {
 async function publish(wap) {
   try {
     wap.isPublished = true
-    if(wap._id){
+    if (wap._id) {
       return await update(wap._id, wap)
     } else {
       return await save(wap)
@@ -95,7 +95,7 @@ async function publish(wap) {
 async function addNewSubscriber(wapId, subscriber) {
   try {
     const wap = await getById(wapId)
-    let subscribers = wap.subscribers ? [subscriber, wap.subscribers] : [subscriber]
+    let subscribers = wap.subscribers ? [subscriber, ...wap.subscribers] : [subscriber]
     wap.subscribers = subscribers
     await update(wapId, wap)
   } catch (err) {

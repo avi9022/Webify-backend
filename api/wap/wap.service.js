@@ -14,7 +14,6 @@ module.exports = {
 }
 
 async function query(filterBy = {}) {
-  console.log(filterBy)
   const criteria = _buildCriteria(filterBy)
   try {
     const collection = await dbService.getCollection('wap')
@@ -95,7 +94,9 @@ async function publish(wap) {
 async function addNewSubscriber(wapId, subscriber) {
   try {
     const wap = await getById(wapId)
-    let subscribers = wap.subscribers ? [subscriber, ...wap.subscribers] : [subscriber]
+    let subscribers = wap.subscribers
+      ? [subscriber, ...wap.subscribers]
+      : [subscriber]
     wap.subscribers = subscribers
     await update(wapId, wap)
   } catch (err) {

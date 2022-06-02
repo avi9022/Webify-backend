@@ -12,6 +12,7 @@ router.post('/', requireAuth, saveWap)
 router.put('/:id', requireAuth, updateWap)
 router.put('/:id/newSubscriber', addNewSubscriber)
 router.put('/:id/publish', requireAuth, publishWap)
+router.post('/publish', requireAuth, publishWap)
 router.put('/:id/increaseview', requireAuth, increaseViewCount)
 router.delete('/:id', requireAuth, removeWap)
 

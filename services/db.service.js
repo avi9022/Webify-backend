@@ -30,7 +30,6 @@ async function connect() {
       useUnifiedTopology: true,
     })
     const db = client.db(dbName)
-    console.log(db)
     dbConn = db
     return db
   } catch (err) {

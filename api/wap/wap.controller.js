@@ -68,15 +68,13 @@ async function addNewSubscriber(req, res) {
 
 async function publishWap(req, res) {
   try {
-    // const wapId = req.params.id
     const wap = req.body
     const publishedWap = await wapService.publish(wap)
-    // if (wapId) {
-    // }
-    // else {
-    //   await wapService.publish(wap)
-    // }
-    res.send(publishedWap.ops[0])
+    if (publishedWap.ops) {
+      res.send(publishedWap.ops[0])
+    } else {
+      res.send(publishedWap)
+    }
   } catch (err) {
     logger.error('Failed to publish wap', err)
     res.status(500).send({ err: 'Failed to publish wap' })

@@ -36,7 +36,7 @@ function setupSocketAPI(http) {
             // gIo.to(socket.CurrEditorId).emit('wap update', wap)
             //when getting here - it should broadcast the wap
             // socket.broadcast.to(socket.CurrEditorId).emit('wap update', wap)
-            socket.broadcast.emit('wap update', wap)
+            socket.broadcast.to(socket.CurrEditorId).emit('wap update', wap)
         })
         socket.on('set-user-socket', userId => {
             logger.info(`Setting socket.userId = ${userId} for socket [id: ${socket.id}]`)

@@ -1,7 +1,17 @@
 const logger = require('./logger.service')
 
 let gIo = null
-const mouseColors = ['blue','red','green','orange','yellow','purple']
+const mouseColors = [
+'#F28B82',
+'#FBBC04',
+'#CCFF90',
+'#A7FFEB',
+'#CBF0F8',
+'#F1E4DE',
+'#D7AEFB',
+'#FDCFE8',
+'#E6C9A8'
+]
 const connectedMouses = [] 
 
 function setupSocketAPI(http) {
@@ -14,6 +24,10 @@ function setupSocketAPI(http) {
     logger.info(`New connected socket [id: ${socket.id}]`)
     socket.on('disconnect', (socket) => {
       logger.info(`Socket disconnected [id: ${socket.id}]`)
+      if(connectedMouses.length){
+        const mouseIdx = connectedMouses.findIndex(mouse => mouse.id === socket.id)
+        connectedMouses.splice(mouseIdx,1)
+      }
     })
     gIo.on('connection', socket => {
         logger.info(`New connected socket [id: ${socket.id}]`)
@@ -54,12 +68,13 @@ function setupSocketAPI(http) {
             delete socket.userId
         })
         //mouse movement
-        socket.on('mouse_position', mousePos => {
+        socket.on('mouse_position', mouseInfo => {
+          // console.log('connected:',connectedMouses)
            const mouseIndex = connectedMouses.findIndex((mouse) => socket.id === mouse.id)
            if(mouseIndex >= 0){
-             connectedMouses[mouseIndex].pos = mousePos
+             connectedMouses[mouseIndex].pos = mouseInfo.pos
            } else {
-             connectedMouses.push({id: socket.id,pos: mousePos, color: mouseColors[connectedMouses.length]})
+             connectedMouses.push({id: socket.id,pos: mouseInfo.pos,fullname: mouseInfo.user, color: mouseColors[connectedMouses.length]})
            }
             socket.broadcast.to(socket.CurrEditorId).emit('mouse_position_update', connectedMouses)   
         })

@@ -1,18 +1,6 @@
 const logger = require('./logger.service')
 
-let gIo = null
-const mouseColors = [
-'#F28B82',
-'#FBBC04',
-'#CCFF90',
-'#A7FFEB',
-'#CBF0F8',
-'#F1E4DE',
-'#D7AEFB',
-'#FDCFE8',
-'#E6C9A8'
-]
-const connectedMouses = [] 
+var gIo = null
 
 function setupSocketAPI(http) {
   gIo = require('socket.io')(http, {
@@ -24,62 +12,22 @@ function setupSocketAPI(http) {
     logger.info(`New connected socket [id: ${socket.id}]`)
     socket.on('disconnect', (socket) => {
       logger.info(`Socket disconnected [id: ${socket.id}]`)
-      if(connectedMouses.length){
-        const mouseIdx = connectedMouses.findIndex(mouse => mouse.id === socket.id)
-        connectedMouses.splice(mouseIdx,1)
-      }
     })
-    gIo.on('connection', socket => {
-        logger.info(`New connected socket [id: ${socket.id}]`)
-        socket.on('disconnect', socket => {
-            logger.info(`Socket disconnected [id: ${socket.id}]`)
-        })
-        socket.on('wap connection', editorId => {
-            console.log('got editor id',editorId)
-            if (socket.CurrEditorId === editorId) return
-            if (socket.CurrEditorId) {
-                socket.leave(socket.CurrEditorId)
-                logger.info(`Socket is leaving topic ${socket.CurrEditorId} [id: ${socket.id}]`)
-            }
-            socket.join(editorId)
-            socket.CurrEditorId = editorId
-            gIo.to(socket.CurrEditorId).emit('get wap', 'wap')
-        })
-        // socket.on('send wap', wap => {
-        //     logger.info(`sending wap from socket [id: ${socket.id}], to ${socket.CurrEditorId}`)
-        //     gIo.to(socket.CurrEditorId).emit('send wap', wap)
-        // })
-        socket.on('wap update', wap => {
-            logger.info(`Wap update from socket [id: ${socket.id}], emitting wap changes to ${socket.CurrEditorId}`)
-            // emits to all sockets:
-            // gIo.emit('chat addMsg', msg)
-            // emits only to sockets in the same room
-            // gIo.to(socket.CurrEditorId).emit('wap update', wap)
-            //when getting here - it should broadcast the wap
-            // socket.broadcast.to(socket.CurrEditorId).emit('wap update', wap)
-            socket.broadcast.to(socket.CurrEditorId).emit('wap update', wap)
-        })
-        socket.on('set-user-socket', userId => {
-            logger.info(`Setting socket.userId = ${userId} for socket [id: ${socket.id}]`)
-            socket.userId = userId
-        })
-        socket.on('unset-user-socket', () => {
-            logger.info(`Removing socket.userId for socket [id: ${socket.id}]`)
-            delete socket.userId
-        })
-        //mouse movement
-        socket.on('mouse_position', mouseInfo => {
-           const mouseIndex = connectedMouses.findIndex((mouse) => socket.id === mouse.id)
-           if(mouseIndex >= 0){
-             connectedMouses[mouseIndex].pos = mouseInfo.pos
-           } else {
-             connectedMouses.push({id: socket.id,pos: mouseInfo.pos,fullname: mouseInfo.user, color: mouseColors[connectedMouses.length]})
-           }
-            socket.broadcast.to(socket.CurrEditorId).emit('mouse_position_update', connectedMouses)   
-        })
+    socket.on('wap connection', (editorId) => {
+      console.log('got editor id', editorId)
+      if (socket.CurrEditorId === editorId) return
+      if (socket.CurrEditorId) {
+        socket.leave(socket.CurrEditorId)
+        logger.info(
+          `Socket is leaving topic ${socket.CurrEditorId} [id: ${socket.id}]`
+        )
+      }
+      socket.join(editorId)
+      socket.CurrEditorId = editorId
+      gIo.to(socket.CurrEditorId).emit('get wap', 'wap')
     })
     // socket.on('send wap', wap => {
-    //     logger.info(`sending wap from socket [id: ${socket.id}], to ${socket.CurrEditorId}`)
+    //     logger.info(``sending wap from socket [id: ${socket.id}], to ${socket.CurrEditorId}`)
     //     gIo.to(socket.CurrEditorId).emit('send wap', wap)
     // })
     socket.on('wap update', (wap) => {
@@ -105,9 +53,6 @@ function setupSocketAPI(http) {
       delete socket.userId
     })
     //mouse movement
-    socket.on('mouse_position', (data) => {
-      socket.broadcast.emit('mouse_position_update', data)
-    })
   })
 }
 

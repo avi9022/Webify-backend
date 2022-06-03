@@ -69,7 +69,6 @@ function setupSocketAPI(http) {
         })
         //mouse movement
         socket.on('mouse_position', mouseInfo => {
-          // console.log('connected:',connectedMouses)
            const mouseIndex = connectedMouses.findIndex((mouse) => socket.id === mouse.id)
            if(mouseIndex >= 0){
              connectedMouses[mouseIndex].pos = mouseInfo.pos

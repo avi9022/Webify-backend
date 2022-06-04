@@ -1,4 +1,6 @@
 const logger = require('./logger.service')
+const wapService = require('../api/wap/wap.service')
+const userService = require('../api/user/user.service')
 
 let gIo = null
 const mouseColors = ['#F28B82', '#FBBC04', '#CCFF90', '#A7FFEB', '#CBF0F8', '#F1E4DE', '#D7AEFB', '#FDCFE8', '#E6C9A8']
@@ -16,6 +18,16 @@ function setupSocketAPI(http) {
       logger.info(`Socket disconnected [id: ${socket.id}]`)
     })
 
+    socket.on('user_logged', (userId) => {
+      if (socket.userId === userId) return
+      if (socket.userId) {
+        socket.leave(socket.userId)
+        logger.info(`Socket is leaving room ${socket.userId} [id: ${userId}]`)
+      }
+      socket.join(userId)
+      socket.userId = userId
+    })
+
     socket.on('wap connection', (editorId) => {
       if (socket.CurrEditorId === editorId) return
       if (socket.CurrEditorId) {
@@ -30,6 +42,13 @@ function setupSocketAPI(http) {
     socket.on('wap update', (wap) => {
       logger.info(`Wap update from socket [id: ${socket.id}], emitting wap changes to ${socket.CurrEditorId}`)
       broadcast({ type: 'wap update', data: wap, room: socket.CurrEditorId, userId: socket.id })
+    })
+
+    socket.on('subscribed', (wapId) => {
+      logger.info(`New subscription from [id: ${socket.id}], in wap ${wapId}`)
+      const wapOwner = wapService.getById(wapId).createdBy
+      const ownerId = userService.getUser({ email: wapOwner })._id
+      broadcast({ type: 'new_subscriber', data: null, room: ownerId, userId: socket.id })
     })
 
     socket.on('set-user-socket', (userId) => {

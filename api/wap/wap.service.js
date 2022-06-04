@@ -45,6 +45,7 @@ async function getById(wapId) {
 
 async function save(wap) {
   try {
+    wap.viewCount = {}
     const collection = await dbService.getCollection('wap')
     return await collection.insertOne(wap)
   } catch (err) {
@@ -80,6 +81,7 @@ async function remove(wapId) {
 async function publish(wap) {
   try {
     wap.isPublished = true
+
     if (wap._id) {
       return await update(wap._id, wap)
     } else {
@@ -108,10 +110,21 @@ async function addNewSubscriber(wapId, subscriber) {
 async function increaseViewCount(wapId) {
   try {
     const wap = await getById(wapId)
-    wap.viewCount = wap.viewCount ? wap.viewCount + 1 : 1
+    const currDate = `${new Date().getDate()}/${
+      new Date().getMonth() + 1
+    }/${new Date().getFullYear()}`
+    wap.viewCount = wap.viewCount
+      ? {
+          ...wap.viewCount,
+          [currDate]: wap?.viewCount[currDate]
+            ? wap?.viewCount[currDate] + 1
+            : 1,
+        }
+      : { [currDate]: 1 }
+    console.log(wap?.viewCount[currDate])
     await update(wapId, wap)
   } catch (err) {
-    logger.error(`cannot add sbscriber to wap: ${wapId}`, err)
+    logger.error(`cannot add subscriber to wap: ${wapId}`, err)
     throw err
   }
 }

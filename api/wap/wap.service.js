@@ -96,13 +96,34 @@ async function publish(wap) {
 async function addNewSubscriber(wapId, subscriber) {
   try {
     const wap = await getById(wapId)
-    let subscribers = wap.subscribers
-      ? [subscriber, ...wap.subscribers]
-      : [subscriber]
-    wap.subscribers = subscribers
+    const currDate = `${new Date().getDate()}/${
+      new Date().getMonth() + 1
+    }/${new Date().getFullYear()}`
+    wap.subscribers = wap?.subscribers
+      ? {
+          ...wap?.subscribers,
+          [currDate]: wap?.subscribers[currDate]
+            ? [...wap?.subscribers[currDate], subscriber]
+            : [subscriber],
+        }
+      : { [currDate]: [subscriber] }
+
+    wap.conversionRate = wap.conversionRate
+      ? {
+          ...wap?.conversionRate,
+          [currDate]:
+            (wap?.subscribers[currDate].length / wap?.viewCount[currDate]) *
+            100,
+        }
+      : {
+          [currDate]:
+            (wap?.subscribers[currDate].length / wap?.viewCount[currDate]) *
+            100,
+        }
+
     await update(wapId, wap)
   } catch (err) {
-    logger.error(`cannot add sbscriber to wap: ${wapId}`, err)
+    logger.error(`cannot add subscriber to wap: ${wapId}`, err)
     throw err
   }
 }

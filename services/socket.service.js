@@ -3,6 +3,7 @@ const wapService = require('../api/wap/wap.service')
 const userService = require('../api/user/user.service')
 
 let gIo = null
+
 const mouseColors = [
   '#F28B82',
   '#FBBC04',
@@ -14,6 +15,7 @@ const mouseColors = [
   '#FDCFE8',
   '#E6C9A8',
 ]
+
 
 function setupSocketAPI(http) {
   gIo = require('socket.io')(http, {
@@ -38,30 +40,32 @@ function setupSocketAPI(http) {
     })
 
     socket.on('wap connection', (editorId) => {
-      if (socket.CurrEditorId === editorId) return
-      if (socket.CurrEditorId) {
-        socket.leave(socket.CurrEditorId)
+      if (socket.currEditorId === editorId) return
+      if (socket.currEditorId) {
+        socket.leave(socket.currEditorId)
         logger.info(
-          `Socket is leaving room ${socket.CurrEditorId} [id: ${socket.id}]`
+          `Socket is leaving room ${socket.currEditorId} [id: ${socket.id}]`
         )
       }
       socket.join(editorId)
-      socket.CurrEditorId = editorId
+      socket.currEditorId = editorId
+      const color = mouseColors.splice(Math.floor(Math.random()*9),1)[0]
+      socket.mouseColor = color
       broadcast({
         type: 'get wap',
-        room: socket.CurrEditorId,
+        room: socket.currEditorId,
         userId: socket.id,
       })
     })
 
     socket.on('wap update', (wap) => {
       logger.info(
-        `Wap update from socket [id: ${socket.id}], emitting wap changes to ${socket.CurrEditorId}`
+        `Wap update from socket [id: ${socket.id}], emitting wap changes to ${socket.currEditorId}`
       )
       broadcast({
         type: 'wap update',
         data: wap,
-        room: socket.CurrEditorId,
+        room: socket.currEditorId,
         userId: socket.id,
       })
     })
@@ -92,8 +96,8 @@ function setupSocketAPI(http) {
     socket.on('mouse_position', ({ pos, user }) => {
       broadcast({
         type: 'mouse_position_update',
-        data: { id: socket.id, pos, user },
-        room: socket.CurrEditorId,
+        data: { id: socket.id, pos, user, color: socket.mouseColor },
+        room: socket.currEditorId,
         userId: socket.id,
       })
     })

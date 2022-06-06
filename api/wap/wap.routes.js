@@ -13,7 +13,7 @@ router.put('/:id', requireAuth, updateWap)
 router.put('/:id/newSubscriber', addNewSubscriber)
 router.put('/:id/publish', requireAuth, publishWap)
 router.post('/publish', requireAuth, publishWap)
-router.put('/:id/increaseview', requireAuth, increaseViewCount)
+router.put('/:id/increaseview', increaseViewCount)
 router.delete('/:id', requireAuth, removeWap)
 
 module.exports = router

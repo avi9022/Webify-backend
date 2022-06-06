@@ -4,18 +4,7 @@ const userService = require('../api/user/user.service')
 
 let gIo = null
 
-const mouseColors = [
-  '#F28B82',
-  '#FBBC04',
-  '#CCFF90',
-  '#A7FFEB',
-  '#CBF0F8',
-  '#F1E4DE',
-  '#D7AEFB',
-  '#FDCFE8',
-  '#E6C9A8',
-]
-
+const mouseColors = ['#F28B82', '#FBBC04', '#CCFF90', '#A7FFEB', '#CBF0F8', '#F1E4DE', '#D7AEFB', '#FDCFE8', '#E6C9A8']
 
 function setupSocketAPI(http) {
   gIo = require('socket.io')(http, {
@@ -25,7 +14,13 @@ function setupSocketAPI(http) {
   })
   gIo.on('connection', (socket) => {
     logger.info(`New connected socket [id: ${socket.id}]`)
-    socket.on('disconnect', (socket) => {
+    socket.on('disconnect', () => {
+      broadcast({
+        type: 'user_left',
+        data: { userId: socket.id },
+        room: socket.currEditorId,
+        userId: socket.id,
+      })
       logger.info(`Socket disconnected [id: ${socket.id}]`)
     })
 
@@ -43,13 +38,11 @@ function setupSocketAPI(http) {
       if (socket.currEditorId === editorId) return
       if (socket.currEditorId) {
         socket.leave(socket.currEditorId)
-        logger.info(
-          `Socket is leaving room ${socket.currEditorId} [id: ${socket.id}]`
-        )
+        logger.info(`Socket is leaving room ${socket.currEditorId} [id: ${socket.id}]`)
       }
       socket.join(editorId)
       socket.currEditorId = editorId
-      const color = mouseColors.splice(Math.floor(Math.random()*9),1)[0]
+      const color = mouseColors.splice(Math.floor(Math.random() * 9), 1)[0]
       socket.mouseColor = color
       broadcast({
         type: 'get wap',
@@ -59,9 +52,7 @@ function setupSocketAPI(http) {
     })
 
     socket.on('wap update', (wap) => {
-      logger.info(
-        `Wap update from socket [id: ${socket.id}], emitting wap changes to ${socket.currEditorId}`
-      )
+      logger.info(`Wap update from socket [id: ${socket.id}], emitting wap changes to ${socket.currEditorId}`)
       broadcast({
         type: 'wap update',
         data: wap,
@@ -83,9 +74,7 @@ function setupSocketAPI(http) {
     })
 
     socket.on('set-user-socket', (userId) => {
-      logger.info(
-        `Setting socket.userId = ${userId} for socket [id: ${socket.id}]`
-      )
+      logger.info(`Setting socket.userId = ${userId} for socket [id: ${socket.id}]`)
       socket.userId = userId
     })
     socket.on('unset-user-socket', () => {
@@ -113,9 +102,7 @@ async function emitToUser({ type, data, userId }) {
   const socket = await _getUserSocket(userId)
 
   if (socket) {
-    logger.info(
-      `Emiting event: ${type} to user: ${userId} socket [id: ${socket.id}]`
-    )
+    logger.info(`Emiting event: ${type} to user: ${userId} socket [id: ${socket.id}]`)
     socket.emit(type, data)
   } else {
     logger.info(`No active socket for user: ${userId}`)
@@ -126,6 +113,7 @@ async function emitToUser({ type, data, userId }) {
 // If possible, send to all sockets BUT not the current socket
 // Optionally, broadcast to a room / to all
 async function broadcast({ type, data, room = null, userId }) {
+  // console.log({ type, data, room, userId })
   logger.info(`Broadcasting event: ${type}`)
   const excludedSocket = await _getUserSocket(userId)
   if (room && excludedSocket) {

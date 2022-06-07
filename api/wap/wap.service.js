@@ -120,8 +120,9 @@ async function addNewSubscriber(wapId, subscriber) {
             (wap?.subscribers[currDate].length / wap?.viewCount[currDate]) *
             100,
         }
-
+    console.log(wap.subscribers)
     await update(wapId, wap)
+    return wap
   } catch (err) {
     logger.error(`cannot add subscriber to wap: ${wapId}`, err)
     throw err
@@ -142,8 +143,8 @@ async function increaseViewCount(wapId) {
             : 1,
         }
       : { [currDate]: 1 }
-    console.log(wap?.viewCount[currDate])
     await update(wapId, wap)
+    return wap
   } catch (err) {
     logger.error(`cannot add subscriber to wap: ${wapId}`, err)
     throw err

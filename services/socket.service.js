@@ -13,6 +13,7 @@ function setupSocketAPI(http) {
     },
   })
   gIo.on('connection', (socket) => {
+    console.log('new connection')
     logger.info(`New connected socket [id: ${socket.id}]`)
     socket.on('disconnect', () => {
       broadcast({
@@ -87,6 +88,25 @@ function setupSocketAPI(http) {
         type: 'mouse_position_update',
         data: { id: socket.id, pos, user, color: socket.mouseColor },
         room: socket.currEditorId,
+        userId: socket.id,
+      })
+    })
+    socket.on('dashboard connection', (publishId) => {
+      console.log('dashboard connection',publishId)
+      if (socket.currPublishId === publishId) return
+      // if (socket.currEditorId) {
+      //   socket.leave(socket.currEditorId)
+      //   logger.info(`Socket is leaving room ${socket.currEditorId} [id: ${socket.id}]`)
+      // }
+      socket.join(publishId)
+      socket.currPublishId = publishId
+    })
+    socket.on('dashboard update', (wap) => {
+      // console.log('got dashboard update',wap)
+      broadcast({
+        type: 'dashboard update',
+        data: wap,
+        room: wap._id,
         userId: socket.id,
       })
     })

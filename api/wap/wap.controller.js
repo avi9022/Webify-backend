@@ -58,8 +58,9 @@ async function addNewSubscriber(req, res) {
   try {
     const subscriber = req.body
     const wapId = req.params.id
-    await wapService.addNewSubscriber(wapId, subscriber)
-    res.send()
+    const updatedWap = await wapService.addNewSubscriber(wapId, subscriber)
+    updatedWap._id = wapId
+    res.send(updatedWap)
   } catch (err) {
     logger.error('Failed to add subscriber', err)
     res.status(500).send({ err: 'Failed to add subscriber' })
@@ -84,8 +85,9 @@ async function publishWap(req, res) {
 async function increaseViewCount(req, res) {
   try {
     const wapId = req.params.id
-    await wapService.increaseViewCount(wapId)
-    res.send()
+    const updatedWap = await wapService.increaseViewCount(wapId)
+    updatedWap._id = wapId
+    res.send(updatedWap)
   } catch (err) {
     logger.error('Failed to publish wap', err)
     res.status(500).send({ err: 'Failed to publish wap' })

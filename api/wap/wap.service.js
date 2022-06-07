@@ -102,9 +102,7 @@ async function addNewSubscriber(wapId, subscriber) {
     wap.subscribers = wap?.subscribers
       ? {
           ...wap?.subscribers,
-          [currDate]: wap?.subscribers[currDate]
-            ? [...wap?.subscribers[currDate], subscriber]
-            : [subscriber],
+          [currDate]: wap?.subscribers[currDate] ? [...wap?.subscribers[currDate], subscriber]: [subscriber],
         }
       : { [currDate]: [subscriber] }
 

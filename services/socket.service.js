@@ -4,7 +4,7 @@ const userService = require('../api/user/user.service')
 
 let gIo = null
 
-const mouseColors = ['#F28B82', '#FBBC04', '#CCFF90', '#A7FFEB', '#CBF0F8', '#F1E4DE', '#D7AEFB', '#FDCFE8', '#E6C9A8']
+const mouseColors = ['#FF8B82', '#FFBC04', '#CFFF90', '#AFFFEB', '#CFF0F8', '#FFE4DE', '#DFAEFB', '#FFCFE8', '#EFC9A8']
 
 function setupSocketAPI(http) {
   gIo = require('socket.io')(http, {
@@ -13,7 +13,6 @@ function setupSocketAPI(http) {
     },
   })
   gIo.on('connection', (socket) => {
-    console.log('new connection')
     logger.info(`New connected socket [id: ${socket.id}]`)
     socket.on('disconnect', () => {
       broadcast({

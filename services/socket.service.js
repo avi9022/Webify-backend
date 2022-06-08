@@ -45,7 +45,9 @@ function setupSocketAPI(http) {
     })
 
     socket.on('wap connection', (editorId) => {
-      if (socket.currEditorId === editorId) return
+      if (socket.currEditorId === editorId) {
+        return
+      }
       if (socket.currEditorId) {
         socket.leave(socket.currEditorId)
         logger.info(
@@ -115,6 +117,7 @@ function setupSocketAPI(http) {
     })
     //mouse movement
     socket.on('mouse_position', ({ pos, user }) => {
+      
       broadcast({
         type: 'mouse_position_update',
         data: { id: socket.id, pos, user, color: socket.mouseColor },
@@ -123,7 +126,6 @@ function setupSocketAPI(http) {
       })
     })
     socket.on('dashboard connection', (publishId) => {
-      console.log('dashboard connection', publishId)
       if (socket.currPublishId === publishId) return
       // if (socket.currEditorId) {
       //   socket.leave(socket.currEditorId)
